@@ -184,50 +184,40 @@ export type Database = {
       }
     }
     Views: {
-      profiles_public: {
-        Row: {
-          company: string | null
-          country: string | null
-          created_at: string | null
-          first_name: string | null
-          full_name: string | null
-          id: string | null
-          trust_level: Database["public"]["Enums"]["trust_level"] | null
-          verification_status:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
-          website_url: string | null
-        }
-        Insert: {
-          company?: string | null
-          country?: string | null
-          created_at?: string | null
-          first_name?: string | null
-          full_name?: string | null
-          id?: string | null
-          trust_level?: Database["public"]["Enums"]["trust_level"] | null
-          verification_status?:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
-          website_url?: string | null
-        }
-        Update: {
-          company?: string | null
-          country?: string | null
-          created_at?: string | null
-          first_name?: string | null
-          full_name?: string | null
-          id?: string | null
-          trust_level?: Database["public"]["Enums"]["trust_level"] | null
-          verification_status?:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
-          website_url?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_directory_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          company: string
+          country: string
+          created_at: string
+          first_name: string
+          full_name: string
+          id: string
+          trust_level: Database["public"]["Enums"]["trust_level"]
+          website_url: string
+        }[]
+      }
+      get_directory_profiles: {
+        Args: {
+          result_limit?: number
+          result_offset?: number
+          search_country?: string
+          search_query?: string
+        }
+        Returns: {
+          company: string
+          country: string
+          created_at: string
+          first_name: string
+          full_name: string
+          id: string
+          trust_level: Database["public"]["Enums"]["trust_level"]
+          website_url: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
