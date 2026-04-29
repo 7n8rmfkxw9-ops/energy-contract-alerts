@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { label: "Producteurs", href: "#producteurs" },
@@ -8,6 +9,14 @@ const navItems = [
 ];
 
 export const Nav = () => {
+  const { session, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   return (
     <header className="absolute top-0 left-0 right-0 z-50">
       <div className="container flex items-center justify-between py-6">
@@ -27,12 +36,21 @@ export const Nav = () => {
             </a>
           ))}
         </nav>
-        <a
-          href="#waitlist"
-          className="text-sm font-medium px-5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground hover:text-primary transition-all"
-        >
-          Rejoindre
-        </a>
+        {session ? (
+          <button
+            onClick={handleSignOut}
+            className="text-sm font-medium px-5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground hover:text-primary transition-all"
+          >
+            Se déconnecter
+          </button>
+        ) : (
+          <Link
+            to="/auth"
+            className="text-sm font-medium px-5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground hover:text-primary transition-all"
+          >
+            Connexion
+          </Link>
+        )}
       </div>
     </header>
   );
