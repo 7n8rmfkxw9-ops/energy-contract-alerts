@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
 
 const navItems = [
   { label: "Producteurs", href: "#producteurs" },
@@ -10,6 +11,7 @@ const navItems = [
 
 export const Nav = () => {
   const { session, signOut } = useAuth();
+  const { isAdmin } = useUserRoles();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -37,12 +39,28 @@ export const Nav = () => {
           ))}
         </nav>
         {session ? (
-          <button
-            onClick={handleSignOut}
-            className="text-sm font-medium px-5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground hover:text-primary transition-all"
-          >
-            Se déconnecter
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/verification"
+              className="hidden sm:inline text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground"
+            >
+              Mon compte
+            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden sm:inline text-sm font-medium text-terracotta hover:text-terracotta/80"
+              >
+                Admin
+              </Link>
+            )}
+            <button
+              onClick={handleSignOut}
+              className="text-sm font-medium px-5 py-2 rounded-full bg-primary-foreground/10 backdrop-blur text-primary-foreground border border-primary-foreground/20 hover:bg-primary-foreground hover:text-primary transition-all"
+            >
+              Se déconnecter
+            </button>
+          </div>
         ) : (
           <Link
             to="/auth"

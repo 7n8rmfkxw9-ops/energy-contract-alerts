@@ -16,31 +16,64 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          admin_notes: string | null
           company: string | null
           country: string | null
           created_at: string
           first_name: string | null
           full_name: string | null
           id: string
+          legal_name: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          trust_level: Database["public"]["Enums"]["trust_level"]
           updated_at: string
+          vat_country_code: string | null
+          vat_number: string | null
+          vat_verified: boolean
+          vat_verified_at: string | null
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          website_url: string | null
         }
         Insert: {
+          admin_notes?: string | null
           company?: string | null
           country?: string | null
           created_at?: string
           first_name?: string | null
           full_name?: string | null
           id: string
+          legal_name?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          trust_level?: Database["public"]["Enums"]["trust_level"]
           updated_at?: string
+          vat_country_code?: string | null
+          vat_number?: string | null
+          vat_verified?: boolean
+          vat_verified_at?: string | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          website_url?: string | null
         }
         Update: {
+          admin_notes?: string | null
           company?: string | null
           country?: string | null
           created_at?: string
           first_name?: string | null
           full_name?: string | null
           id?: string
+          legal_name?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          trust_level?: Database["public"]["Enums"]["trust_level"]
           updated_at?: string
+          vat_country_code?: string | null
+          vat_number?: string | null
+          vat_verified?: boolean
+          vat_verified_at?: string | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -65,11 +98,126 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          new_status: Database["public"]["Enums"]["verification_status"] | null
+          notes: string | null
+          previous_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          new_status?: Database["public"]["Enums"]["verification_status"] | null
+          notes?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          new_status?: Database["public"]["Enums"]["verification_status"] | null
+          notes?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_documents: {
+        Row: {
+          created_at: string
+          doc_type: Database["public"]["Enums"]["document_type"]
+          id: string
+          mime_type: string | null
+          original_filename: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number | null
+          status: Database["public"]["Enums"]["verification_status"]
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type: Database["public"]["Enums"]["document_type"]
+          id?: string
+          mime_type?: string | null
+          original_filename?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: Database["public"]["Enums"]["document_type"]
+          id?: string
+          mime_type?: string | null
+          original_filename?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_directory_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          company: string
+          country: string
+          created_at: string
+          first_name: string
+          full_name: string
+          id: string
+          trust_level: Database["public"]["Enums"]["trust_level"]
+          website_url: string
+        }[]
+      }
+      get_directory_profiles: {
+        Args: {
+          result_limit?: number
+          result_offset?: number
+          search_country?: string
+          search_query?: string
+        }
+        Returns: {
+          company: string
+          country: string
+          created_at: string
+          first_name: string
+          full_name: string
+          id: string
+          trust_level: Database["public"]["Enums"]["trust_level"]
+          website_url: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -80,6 +228,17 @@ export type Database = {
     }
     Enums: {
       app_role: "producteur" | "torrefacteur" | "shop" | "barista" | "admin"
+      document_type:
+        | "business_registration"
+        | "vat_certificate"
+        | "organic_certification"
+        | "fairtrade_certification"
+        | "farm_photo"
+        | "shop_photo"
+        | "id_document"
+        | "other"
+      trust_level: "none" | "bronze" | "silver" | "gold"
+      verification_status: "pending" | "in_review" | "verified" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -208,6 +367,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["producteur", "torrefacteur", "shop", "barista", "admin"],
+      document_type: [
+        "business_registration",
+        "vat_certificate",
+        "organic_certification",
+        "fairtrade_certification",
+        "farm_photo",
+        "shop_photo",
+        "id_document",
+        "other",
+      ],
+      trust_level: ["none", "bronze", "silver", "gold"],
+      verification_status: ["pending", "in_review", "verified", "rejected"],
     },
   },
 } as const
