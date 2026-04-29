@@ -1,6 +1,6 @@
-import { corsHeaders } from "@supabase/supabase-js/cors";
-import { createClient } from "@supabase/supabase-js";
-import { z } from "https://esm.sh/zod@3.23.8";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { z } from "npm:zod@3.23.8";
 
 // VIES (VAT Information Exchange System) - free EU VAT validation
 // REST endpoint: https://ec.europa.eu/taxation_customs/vies/rest-api/
