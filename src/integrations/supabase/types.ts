@@ -83,6 +83,41 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          last_message_at: string
+          lot_id: string
+          producer_id: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          lot_id: string
+          producer_id: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          lot_id?: string
+          producer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "coffee_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lot_favorites: {
         Row: {
           created_at: string
@@ -108,6 +143,50 @@ export type Database = {
             columns: ["lot_id"]
             isOneToOne: false
             referencedRelation: "coffee_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_id: string
+          source_lang: string | null
+          translated_body: string | null
+          translated_lang: string | null
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id: string
+          source_lang?: string | null
+          translated_body?: string | null
+          translated_lang?: string | null
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string
+          source_lang?: string | null
+          translated_body?: string | null
+          translated_lang?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -375,6 +454,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_conversation_participant: {
+        Args: { _conv_id: string; _user_id: string }
         Returns: boolean
       }
       is_lot_publicly_visible: { Args: { _lot_id: string }; Returns: boolean }
