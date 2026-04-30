@@ -129,9 +129,13 @@ const Inner = () => {
       variety: parsed.data.variety || null,
       producer_notes: parsed.data.producer_notes || null,
     };
-    const res = isNew
-      ? await supabase.from("coffee_lots").insert(payload).select("id").maybeSingle()
-      : await supabase.from("coffee_lots").update(payload).eq("id", id!).select("id").maybeSingle();
+    let res;
+    if (isNew) {
+      res = await supabase.from("coffee_lots").insert(payload).select("id").maybeSingle();
+    } else {
+      const { producer_id: _omit, ...updatePayload } = payload;
+      res = await supabase.from("coffee_lots").update(updatePayload).eq("id", id!).select("id").maybeSingle();
+    }
     setSaving(false);
     if (res.error) {
       toast({ title: "Sauvegarde impossible", description: res.error.message, variant: "destructive" });
