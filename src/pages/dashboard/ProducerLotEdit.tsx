@@ -123,12 +123,17 @@ const Inner = () => {
     setSaving(true);
     const payload = {
       ...parsed.data,
+      name: parsed.data.name,
+      volume_kg: parsed.data.volume_kg,
+      price_per_kg: parsed.data.price_per_kg,
+      currency: parsed.data.currency,
+      status: parsed.data.status,
       flavor_notes: form.flavor_notes,
       photo_url: form.photo_url || null,
       producer_id: user.id,
       variety: parsed.data.variety || null,
       producer_notes: parsed.data.producer_notes || null,
-    };
+    } as const;
     let res;
     if (isNew) {
       res = await supabase.from("coffee_lots").insert([payload]).select("id").maybeSingle();
