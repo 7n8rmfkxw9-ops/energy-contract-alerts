@@ -41,10 +41,10 @@ export const Nav = () => {
         {session ? (
           <div className="flex items-center gap-3">
             <Link
-              to="/verification"
+              to="/dashboard"
               className="hidden sm:inline text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground"
             >
-              Mon compte
+              Mon espace
             </Link>
             {isAdmin && (
               <Link

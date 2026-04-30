@@ -14,18 +14,223 @@ export type Database = {
   }
   public: {
     Tables: {
+      coffee_lots: {
+        Row: {
+          acidity: number | null
+          body: number | null
+          created_at: string
+          currency: string
+          flavor_notes: string[]
+          harvest_year: number | null
+          humidity_pct: number | null
+          id: string
+          name: string
+          photo_url: string | null
+          price_per_kg: number
+          process: Database["public"]["Enums"]["process_method"] | null
+          producer_id: string
+          producer_notes: string | null
+          sca_score: number | null
+          status: Database["public"]["Enums"]["lot_status"]
+          sweetness: number | null
+          updated_at: string
+          variety: string | null
+          volume_kg: number
+        }
+        Insert: {
+          acidity?: number | null
+          body?: number | null
+          created_at?: string
+          currency?: string
+          flavor_notes?: string[]
+          harvest_year?: number | null
+          humidity_pct?: number | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          price_per_kg: number
+          process?: Database["public"]["Enums"]["process_method"] | null
+          producer_id: string
+          producer_notes?: string | null
+          sca_score?: number | null
+          status?: Database["public"]["Enums"]["lot_status"]
+          sweetness?: number | null
+          updated_at?: string
+          variety?: string | null
+          volume_kg: number
+        }
+        Update: {
+          acidity?: number | null
+          body?: number | null
+          created_at?: string
+          currency?: string
+          flavor_notes?: string[]
+          harvest_year?: number | null
+          humidity_pct?: number | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          price_per_kg?: number
+          process?: Database["public"]["Enums"]["process_method"] | null
+          producer_id?: string
+          producer_notes?: string | null
+          sca_score?: number | null
+          status?: Database["public"]["Enums"]["lot_status"]
+          sweetness?: number | null
+          updated_at?: string
+          variety?: string | null
+          volume_kg?: number
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          last_message_at: string
+          lot_id: string
+          producer_id: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          lot_id: string
+          producer_id: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          lot_id?: string
+          producer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "coffee_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          lot_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_favorites_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "coffee_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_id: string
+          source_lang: string | null
+          translated_body: string | null
+          translated_lang: string | null
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id: string
+          source_lang?: string | null
+          translated_body?: string | null
+          translated_lang?: string | null
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string
+          source_lang?: string | null
+          translated_body?: string | null
+          translated_lang?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      producer_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          producer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          producer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          producer_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           admin_notes: string | null
+          altitude_m: number | null
+          certifications: Database["public"]["Enums"]["certification"][]
+          city: string | null
           company: string | null
           country: string | null
           created_at: string
+          description: string | null
           first_name: string | null
           full_name: string | null
           id: string
           legal_name: string | null
+          photo_url: string | null
+          region: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          sourcing_preferences: Json
           trust_level: Database["public"]["Enums"]["trust_level"]
           updated_at: string
           vat_country_code: string | null
@@ -37,15 +242,22 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          altitude_m?: number | null
+          certifications?: Database["public"]["Enums"]["certification"][]
+          city?: string | null
           company?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
           legal_name?: string | null
+          photo_url?: string | null
+          region?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          sourcing_preferences?: Json
           trust_level?: Database["public"]["Enums"]["trust_level"]
           updated_at?: string
           vat_country_code?: string | null
@@ -57,15 +269,22 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          altitude_m?: number | null
+          certifications?: Database["public"]["Enums"]["certification"][]
+          city?: string | null
           company?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
           legal_name?: string | null
+          photo_url?: string | null
+          region?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          sourcing_preferences?: Json
           trust_level?: Database["public"]["Enums"]["trust_level"]
           updated_at?: string
           vat_country_code?: string | null
@@ -190,12 +409,18 @@ export type Database = {
       get_directory_profile: {
         Args: { profile_id: string }
         Returns: {
+          altitude_m: number
+          certifications: Database["public"]["Enums"]["certification"][]
+          city: string
           company: string
           country: string
           created_at: string
+          description: string
           first_name: string
           full_name: string
           id: string
+          photo_url: string
+          region: string
           trust_level: Database["public"]["Enums"]["trust_level"]
           website_url: string
         }[]
@@ -208,12 +433,18 @@ export type Database = {
           search_query?: string
         }
         Returns: {
+          altitude_m: number
+          certifications: Database["public"]["Enums"]["certification"][]
+          city: string
           company: string
           country: string
           created_at: string
+          description: string
           first_name: string
           full_name: string
           id: string
+          photo_url: string
+          region: string
           trust_level: Database["public"]["Enums"]["trust_level"]
           website_url: string
         }[]
@@ -225,9 +456,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_conversation_participant: {
+        Args: { _conv_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_lot_publicly_visible: { Args: { _lot_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "producteur" | "torrefacteur" | "shop" | "barista" | "admin"
+      certification:
+        | "organic"
+        | "fairtrade"
+        | "rainforest_alliance"
+        | "utz"
+        | "demeter"
+        | "direct_trade"
+        | "none"
       document_type:
         | "business_registration"
         | "vat_certificate"
@@ -236,6 +480,15 @@ export type Database = {
         | "farm_photo"
         | "shop_photo"
         | "id_document"
+        | "other"
+      lot_status: "draft" | "available" | "reserved" | "sold_out"
+      process_method:
+        | "washed"
+        | "natural"
+        | "honey"
+        | "anaerobic"
+        | "wet_hulled"
+        | "carbonic_maceration"
         | "other"
       trust_level: "none" | "bronze" | "silver" | "gold"
       verification_status: "pending" | "in_review" | "verified" | "rejected"
@@ -367,6 +620,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["producteur", "torrefacteur", "shop", "barista", "admin"],
+      certification: [
+        "organic",
+        "fairtrade",
+        "rainforest_alliance",
+        "utz",
+        "demeter",
+        "direct_trade",
+        "none",
+      ],
       document_type: [
         "business_registration",
         "vat_certificate",
@@ -375,6 +637,16 @@ export const Constants = {
         "farm_photo",
         "shop_photo",
         "id_document",
+        "other",
+      ],
+      lot_status: ["draft", "available", "reserved", "sold_out"],
+      process_method: [
+        "washed",
+        "natural",
+        "honey",
+        "anaerobic",
+        "wet_hulled",
+        "carbonic_maceration",
         "other",
       ],
       trust_level: ["none", "bronze", "silver", "gold"],
