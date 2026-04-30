@@ -131,7 +131,7 @@ const Inner = () => {
     };
     let res;
     if (isNew) {
-      res = await supabase.from("coffee_lots").insert(payload).select("id").maybeSingle();
+      res = await supabase.from("coffee_lots").insert([payload]).select("id").maybeSingle();
     } else {
       const { producer_id: _omit, ...updatePayload } = payload;
       res = await supabase.from("coffee_lots").update(updatePayload).eq("id", id!).select("id").maybeSingle();
