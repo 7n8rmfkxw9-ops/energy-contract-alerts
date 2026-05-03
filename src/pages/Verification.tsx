@@ -180,9 +180,17 @@ const Verification = () => {
   return (
     <main className="min-h-screen bg-background py-12 px-6">
       <div className="container max-w-3xl">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
-          <ArrowLeft className="w-4 h-4" /> Retour
-        </Link>
+        <div className="flex items-center justify-between mb-8 gap-3 flex-wrap">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" /> Retour au dashboard
+          </Link>
+          <Link
+            to="/dashboard"
+            className="text-sm font-medium px-5 py-2 rounded-full bg-terracotta text-accent-foreground hover:bg-terracotta/90 transition-all"
+          >
+            Accéder à mon espace
+          </Link>
+        </div>
 
         <h1 className="font-display text-4xl md:text-5xl leading-tight">
           Faites <em className="italic text-terracotta">vérifier</em> votre compte
