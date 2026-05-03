@@ -42,7 +42,7 @@ export const Nav = () => {
           <div className="flex items-center gap-3">
             <Link
               to="/dashboard"
-              className="hidden sm:inline text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground"
+              className="text-sm font-medium px-5 py-2 rounded-full bg-terracotta text-accent-foreground hover:bg-terracotta/90 transition-all"
             >
               Mon espace
             </Link>
