@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { z } from "zod";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { signInSchema, signUpSchema } from "@/lib/schemas";
 
 
 const ROLES = [
@@ -13,19 +13,6 @@ const ROLES = [
   { v: "shop", l: "Coffee shop" },
   { v: "barista", l: "Barista" },
 ] as const;
-
-const signUpSchema = z.object({
-  email: z.string().trim().email("Email invalide").max(255),
-  password: z.string().min(8, "8 caractères minimum").max(72),
-  fullName: z.string().trim().min(1, "Nom requis").max(120),
-  company: z.string().trim().max(120).optional().or(z.literal("")),
-  role: z.enum(["producteur", "torrefacteur", "shop", "barista"]),
-});
-
-const signInSchema = z.object({
-  email: z.string().trim().email("Email invalide").max(255),
-  password: z.string().min(1, "Mot de passe requis").max(72),
-});
 
 const Auth = () => {
   const navigate = useNavigate();
