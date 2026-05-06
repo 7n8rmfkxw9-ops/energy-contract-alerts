@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
-import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
-
-const emailSchema = z.string().trim().email("Email invalide").max(255);
+import { waitlistEmailSchema as emailSchema } from "@/lib/schemas";
 
 export const Waitlist = () => {
   const [email, setEmail] = useState("");

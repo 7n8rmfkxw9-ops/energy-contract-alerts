@@ -1,36 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Loader2, Save, Trash2, Upload } from "lucide-react";
-import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { DashLayout } from "@/components/dashboard/DashLayout";
 import { RoleGate } from "@/components/RoleGate";
 import { PROCESS_LABELS, STATUS_LABELS, type LotStatus, type ProcessMethod } from "@/lib/lots";
+import { lotSchema } from "@/lib/schemas";
 
 const PRODUCER_NAV = [
   { to: "/dashboard/producer", label: "Ma ferme" },
   { to: "/dashboard/producer/lots", label: "Mes lots" },
   { to: "/dashboard/messages", label: "Messages" },
 ];
-
-const lotSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  variety: z.string().trim().max(120).optional().or(z.literal("")),
-  process: z.enum(["washed","natural","honey","anaerobic","wet_hulled","carbonic_maceration","other"]).optional().nullable(),
-  humidity_pct: z.coerce.number().min(0).max(100).optional().nullable(),
-  acidity: z.coerce.number().min(0).max(10).optional().nullable(),
-  body: z.coerce.number().min(0).max(10).optional().nullable(),
-  sweetness: z.coerce.number().min(0).max(10).optional().nullable(),
-  sca_score: z.coerce.number().min(0).max(100).optional().nullable(),
-  volume_kg: z.coerce.number().min(0),
-  price_per_kg: z.coerce.number().min(0),
-  currency: z.string().length(3),
-  status: z.enum(["draft","available","reserved","sold_out"]),
-  harvest_year: z.coerce.number().int().min(2000).max(2100).optional().nullable(),
-  producer_notes: z.string().trim().max(1500).optional().or(z.literal("")),
-});
 
 const PROCESSES: ProcessMethod[] = ["washed","natural","honey","anaerobic","wet_hulled","carbonic_maceration","other"];
 const STATUSES: LotStatus[] = ["draft","available","reserved","sold_out"];

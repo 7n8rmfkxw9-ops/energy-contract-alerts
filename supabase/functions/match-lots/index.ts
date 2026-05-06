@@ -2,6 +2,7 @@
 // 1) Score déterministe sur origine, méthode, budget, profil aromatique, score SCA.
 // 2) L'IA enrichit chaque suggestion avec une explication courte.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { scoreLot, type MatchPrefs } from "../_shared/scoring.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,13 +10,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-type Prefs = {
-  origins?: string[];
-  processes?: string[];
-  flavor_keywords?: string[];
-  budget_per_kg_max?: number | null;
-  monthly_volume_kg?: number | null;
-};
+type Prefs = MatchPrefs;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -55,32 +50,8 @@ Deno.serve(async (req) => {
       .filter((l) => verifiedById.has(l.producer_id))
       .map((l) => {
         const prod = verifiedById.get(l.producer_id)!;
-        let score = 40; // base
-        const reasons: string[] = [];
-
-        if (prefs.origins?.length) {
-          const inOrigin = prefs.origins.some((o) =>
-            (prod.country ?? "").toLowerCase().includes(o.toLowerCase()) ||
-            (prod.region ?? "").toLowerCase().includes(o.toLowerCase()));
-          if (inOrigin) { score += 20; reasons.push(`origine ${prod.country}`); }
-        }
-        if (prefs.processes?.length && l.process && prefs.processes.includes(l.process)) {
-          score += 15; reasons.push(`méthode ${l.process}`);
-        }
-        if (prefs.budget_per_kg_max != null) {
-          if (Number(l.price_per_kg) <= prefs.budget_per_kg_max) {
-            score += 10; reasons.push(`prix ≤ budget`);
-          } else { score -= 15; }
-        }
-        if (prefs.flavor_keywords?.length && l.flavor_notes?.length) {
-          const overlap = prefs.flavor_keywords.filter((k) =>
-            l.flavor_notes!.some((n: string) => n.toLowerCase().includes(k.toLowerCase()))).length;
-          if (overlap) { score += Math.min(15, overlap * 5); reasons.push(`profil aromatique`); }
-        }
-        if (l.sca_score && Number(l.sca_score) >= 85) { score += 5; reasons.push("score SCA élevé"); }
-
-        return { lot_id: l.id, score: Math.max(0, Math.min(100, score)),
-                 reasons, lot: l, producer: prod };
+        const { score, reasons } = scoreLot(prefs, l, prod);
+        return { lot_id: l.id, score, reasons, lot: l, producer: prod };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);

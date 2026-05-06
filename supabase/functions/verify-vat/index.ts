@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
+import { normalizeVatNumber } from "../_shared/vat.ts";
 
 // VIES (VAT Information Exchange System) - free EU VAT validation
 // REST endpoint: https://ec.europa.eu/taxation_customs/vies/rest-api/
@@ -60,11 +61,7 @@ Deno.serve(async (req) => {
     }
 
     const { country_code, vat_number } = parsed.data;
-    // Strip non-alphanumeric chars and any leading country prefix
-    let normalized = vat_number.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
-    if (normalized.startsWith(country_code)) {
-      normalized = normalized.slice(country_code.length);
-    }
+    const normalized = normalizeVatNumber(vat_number, country_code);
 
     // Call VIES REST API
     const viesUrl = `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${country_code}/vat/${normalized}`;
