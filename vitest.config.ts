@@ -12,6 +12,23 @@ export default defineConfig({
       "src/**/*.{test,spec}.{ts,tsx}",
       "supabase/functions/**/*.{test,spec}.ts",
     ],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json-summary"],
+      include: [
+        "src/**/*.{ts,tsx}",
+        "supabase/functions/_shared/**/*.ts",
+      ],
+      exclude: [
+        "src/**/*.{test,spec}.{ts,tsx}",
+        "src/test/**",
+        "src/components/ui/**",
+        "src/integrations/supabase/types.ts",
+        "src/main.tsx",
+        "src/vite-env.d.ts",
+        "supabase/functions/**/*.{test,spec}.ts",
+      ],
+    },
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
