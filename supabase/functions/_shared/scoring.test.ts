@@ -41,11 +41,19 @@ describe("scoreLot", () => {
     expect(score).toBe(60);
   });
 
-  it("origin matching is accent-sensitive (current behavior)", () => {
-    // "ethiopie" without accent does NOT match "Éthiopie" — documenting the gap.
-    const prefs: MatchPrefs = { origins: ["ethiopie"] };
-    const { score } = scoreLot(prefs, baseLot, baseProducer);
-    expect(score).toBe(40);
+  it("origin matching is accent-insensitive", () => {
+    // "ethiopie" (no accent) matches "Éthiopie" via NFD diacritic stripping.
+    expect(scoreLot({ origins: ["ethiopie"] }, baseLot, baseProducer).score).toBe(60);
+    // The reason still uses the original (accented) producer country.
+    expect(scoreLot({ origins: ["ethiopie"] }, baseLot, baseProducer).reasons).toContain(
+      "origine Éthiopie",
+    );
+  });
+
+  it("flavor matching is accent-insensitive", () => {
+    const lot: ScoringLot = { ...baseLot, flavor_notes: ["épicé", "vanillé"] };
+    expect(scoreLot({ flavor_keywords: ["epice"] }, lot, baseProducer).score).toBe(45);
+    expect(scoreLot({ flavor_keywords: ["VANILLE"] }, lot, baseProducer).score).toBe(45);
   });
 
   it("does not boost when the origin list does not match", () => {

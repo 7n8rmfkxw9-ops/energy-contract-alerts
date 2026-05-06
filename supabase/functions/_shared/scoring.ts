@@ -37,6 +37,11 @@ const FLAVOR_CAP = 15;
 const SCA_BONUS = 5;
 const SCA_THRESHOLD = 85;
 
+// Lower-case + strip diacritics so "ethiopie" matches "Éthiopie" and
+// "epice" matches "épicé".
+const fold = (s: string): string =>
+  s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+
 export const scoreLot = (
   prefs: MatchPrefs,
   lot: ScoringLot,
@@ -46,11 +51,12 @@ export const scoreLot = (
   const reasons: string[] = [];
 
   if (prefs.origins?.length) {
-    const inOrigin = prefs.origins.some(
-      (o) =>
-        (producer.country ?? "").toLowerCase().includes(o.toLowerCase()) ||
-        (producer.region ?? "").toLowerCase().includes(o.toLowerCase()),
-    );
+    const country = fold(producer.country ?? "");
+    const region = fold(producer.region ?? "");
+    const inOrigin = prefs.origins.some((o) => {
+      const needle = fold(o);
+      return country.includes(needle) || region.includes(needle);
+    });
     if (inOrigin) {
       score += ORIGIN_BONUS;
       reasons.push(`origine ${producer.country}`);
@@ -72,9 +78,11 @@ export const scoreLot = (
   }
 
   if (prefs.flavor_keywords?.length && lot.flavor_notes?.length) {
-    const overlap = prefs.flavor_keywords.filter((k) =>
-      lot.flavor_notes!.some((n) => n.toLowerCase().includes(k.toLowerCase())),
-    ).length;
+    const folded = lot.flavor_notes.map(fold);
+    const overlap = prefs.flavor_keywords.filter((k) => {
+      const needle = fold(k);
+      return folded.some((n) => n.includes(needle));
+    }).length;
     if (overlap) {
       score += Math.min(FLAVOR_CAP, overlap * FLAVOR_PER_KEYWORD);
       reasons.push("profil aromatique");
