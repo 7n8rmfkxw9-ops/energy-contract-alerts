@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, BadgeCheck, Clock, Loader2, ShieldAlert, Upload, X } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Clock, Loader2, LogOut, ShieldAlert, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -49,7 +49,7 @@ const STATUS_LABEL: Record<string, { label: string; classes: string; icon: typeo
 
 const Verification = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   const { isPro, loading: rolesLoading } = useUserRoles();
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -184,12 +184,20 @@ const Verification = () => {
           <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" /> Retour au dashboard
           </Link>
-          <Link
-            to="/dashboard"
-            className="text-sm font-medium px-5 py-2 rounded-full bg-terracotta text-accent-foreground hover:bg-terracotta/90 transition-all"
-          >
-            Accéder à mon espace
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/dashboard"
+              className="text-sm font-medium px-5 py-2 rounded-full bg-terracotta text-accent-foreground hover:bg-terracotta/90 transition-all"
+            >
+              Accéder à mon espace
+            </Link>
+            <button
+              onClick={async () => { await signOut(); navigate("/"); }}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Déconnexion
+            </button>
+          </div>
         </div>
 
         <h1 className="font-display text-4xl md:text-5xl leading-tight">

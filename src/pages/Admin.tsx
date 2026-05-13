@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, BadgeCheck, Loader2, ShieldAlert } from "lucide-react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { ArrowLeft, BadgeCheck, Loader2, LogOut, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -25,8 +25,9 @@ const STATUSES = ["pending", "in_review", "verified", "rejected"] as const;
 const TRUSTS = ["none", "bronze", "silver", "gold"] as const;
 
 const Admin = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   const { isAdmin, loading: rolesLoading } = useUserRoles();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
   const [filter, setFilter] = useState<"all" | typeof STATUSES[number]>("pending");
   const [loading, setLoading] = useState(true);
@@ -98,9 +99,17 @@ const Admin = () => {
   return (
     <main className="min-h-screen bg-background py-12 px-6">
       <div className="container max-w-5xl">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
-          <ArrowLeft className="w-4 h-4" /> Retour
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" /> Retour
+          </Link>
+          <button
+            onClick={async () => { await signOut(); navigate("/"); }}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Déconnexion
+          </button>
+        </div>
         <h1 className="font-display text-4xl">Espace <em className="italic text-terracotta">admin</em></h1>
         <p className="text-muted-foreground mt-2">Validez ou refusez les comptes des membres.</p>
 
