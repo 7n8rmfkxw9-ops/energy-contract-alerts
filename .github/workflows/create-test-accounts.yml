@@ -1,0 +1,103 @@
+name: Create Test Accounts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-accounts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/project-work-continuation-ucxu0c
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install supabase-js
+        run: npm install @supabase/supabase-js
+
+      - name: Create test accounts
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node --input-type=module <<'EOF'
+          import { createClient } from "@supabase/supabase-js";
+
+          const SUPABASE_URL = "https://bjsamqlgxieugqgbfydg.supabase.co";
+          const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+          if (!SERVICE_ROLE_KEY) {
+            console.error("❌ Secret SUPABASE_SERVICE_ROLE_KEY manquant.");
+            console.error("   → Supabase Dashboard → Project Settings → API → service_role");
+            console.error("   → GitHub repo → Settings → Secrets → Actions → New secret");
+            console.error("      Name: SUPABASE_SERVICE_ROLE_KEY   Value: eyJ...");
+            process.exit(1);
+          }
+
+          const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
+
+          const accounts = [
+            { email: "acheteur@terra.coffee",   password: "Terra2026!", role: "shop",       label: "Acheteur",   verify: true,  isAdmin: false },
+            { email: "producteur@terra.coffee", password: "Terra2026!", role: "producteur", label: "Producteur", verify: true,  isAdmin: false },
+            { email: "admin@terra.coffee",      password: "Terra2026!", role: "shop",       label: "Admin",      verify: false, isAdmin: true  },
+          ];
+
+          for (const account of accounts) {
+            console.log(`\n▶ ${account.label} (${account.email})`);
+
+            const { data: created, error: createErr } =
+              await admin.auth.admin.createUser({
+                email: account.email,
+                password: account.password,
+                email_confirm: true,
+              });
+
+            let userId = created?.user?.id;
+
+            if (createErr) {
+              if (createErr.message.includes("already") || createErr.message.includes("registered")) {
+                console.log("  ⚠  Compte existant — mise à jour uniquement");
+                const { data: list } = await admin.auth.admin.listUsers();
+                userId = list?.users?.find(u => u.email === account.email)?.id;
+              } else {
+                console.error("  ✗ Erreur:", createErr.message);
+                continue;
+              }
+            } else {
+              console.log("  ✓ Compte créé et email confirmé");
+            }
+
+            if (!userId) { console.error("  ✗ ID introuvable"); continue; }
+
+            await admin.from("profiles").update({ role: account.role }).eq("id", userId);
+            console.log(`  ✓ Rôle: ${account.role}`);
+
+            if (account.verify) {
+              await admin.from("profiles")
+                .update({ verification_status: "verified", trust_level: "gold" })
+                .eq("id", userId);
+              console.log("  ✓ Statut: vérifié + gold");
+            }
+
+            if (account.isAdmin) {
+              await admin.from("user_roles")
+                .upsert({ user_id: userId, role: "admin" }, { onConflict: "user_id,role" });
+              console.log("  ✓ Rôle admin accordé");
+            }
+
+            console.log(`  ✅ ${account.email} / Terra2026!`);
+          }
+
+          console.log(`
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          Comptes test prêts :
+            acheteur@terra.coffee   / Terra2026!
+            producteur@terra.coffee / Terra2026!
+            admin@terra.coffee      / Terra2026!
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          `);
+          EOF
