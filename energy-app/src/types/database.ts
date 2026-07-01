@@ -2,49 +2,31 @@
 // À terme, remplacer par `supabase gen types typescript` une fois le
 // projet Supabase provisionné (voir supabase/migrations/0001_init.sql).
 
-export type EnergyType = "electricity" | "gas";
-export type ImportSource = "fluvius_csv" | "p1_realtime";
 export type ContractType = "fixed" | "variable" | "dynamic";
 
 export interface Database {
   public: {
     Tables: {
-      csv_imports: {
+      meter_readings: {
         Row: {
           id: string;
           user_id: string;
-          source: ImportSource;
-          energy_type: EnergyType;
-          filename: string;
-          row_count: number;
-          period_start: string | null;
-          period_end: string | null;
-          imported_at: string;
-        };
-        Insert: Omit<
-          Database["public"]["Tables"]["csv_imports"]["Row"],
-          "id" | "imported_at"
-        > & { id?: string; imported_at?: string };
-        Update: Partial<Database["public"]["Tables"]["csv_imports"]["Insert"]>;
-      };
-      consumption_readings: {
-        Row: {
-          id: string;
-          user_id: string;
-          energy_type: EnergyType;
-          reading_at: string;
-          value_kwh: number;
-          source: ImportSource;
-          import_id: string | null;
+          reading_date: string;
+          elec_day_index: number | null;
+          elec_night_index: number | null;
+          gas_index_m3: number | null;
+          note: string | null;
           created_at: string;
+          updated_at: string;
         };
         Insert: Omit<
-          Database["public"]["Tables"]["consumption_readings"]["Row"],
-          "id" | "created_at"
-        > & { id?: string; created_at?: string };
+          Database["public"]["Tables"]["meter_readings"]["Row"],
+          "id" | "created_at" | "updated_at"
+        > & { id?: string; created_at?: string; updated_at?: string };
         Update: Partial<
-          Database["public"]["Tables"]["consumption_readings"]["Insert"]
+          Database["public"]["Tables"]["meter_readings"]["Insert"]
         >;
+        Relationships: [];
       };
       contracts: {
         Row: {
@@ -55,7 +37,6 @@ export interface Database {
           contract_type: ContractType;
           price_elec_kwh_day: number;
           price_elec_kwh_night: number | null;
-          price_elec_kwh_exclusive_night: number | null;
           price_gas_kwh: number;
           fixed_fee_elec_annual: number;
           fixed_fee_gas_annual: number;
@@ -72,15 +53,17 @@ export interface Database {
           "id" | "created_at" | "updated_at"
         > & { id?: string; created_at?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["contracts"]["Insert"]>;
+        Relationships: [];
       };
       contract_simulations: {
         Row: {
           id: string;
           user_id: string;
           contract_id: string;
-          import_id: string | null;
           annual_cost_estimate: number;
           vs_current_diff_eur: number | null;
+          period_start: string | null;
+          period_end: string | null;
           simulated_at: string;
         };
         Insert: Omit<
@@ -90,23 +73,27 @@ export interface Database {
         Update: Partial<
           Database["public"]["Tables"]["contract_simulations"]["Insert"]
         >;
+        Relationships: [];
       };
-      alert_settings: {
+      user_settings: {
         Row: {
           id: string;
           user_id: string;
           threshold_eur_per_year: number;
           notify_email: string | null;
-          enabled: boolean;
+          alerts_enabled: boolean;
+          reading_reminder_days: number;
+          gas_kwh_per_m3: number;
           updated_at: string;
         };
         Insert: Omit<
-          Database["public"]["Tables"]["alert_settings"]["Row"],
+          Database["public"]["Tables"]["user_settings"]["Row"],
           "id" | "updated_at"
         > & { id?: string; updated_at?: string };
         Update: Partial<
-          Database["public"]["Tables"]["alert_settings"]["Insert"]
+          Database["public"]["Tables"]["user_settings"]["Insert"]
         >;
+        Relationships: [];
       };
       alerts: {
         Row: {
@@ -126,7 +113,12 @@ export interface Database {
           "id" | "sent_at"
         > & { id?: string; sent_at?: string };
         Update: Partial<Database["public"]["Tables"]["alerts"]["Insert"]>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
