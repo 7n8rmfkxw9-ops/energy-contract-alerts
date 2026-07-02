@@ -1,0 +1,29 @@
+name: Import Market Offers
+
+on:
+  schedule:
+    # 05:00 UTC tous les jours ; les offres VREG ne changent qu'une fois
+    # par mois, mais un run quotidien absorbe les mises à jour sans délai.
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: energy-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: energy-app/package-lock.json
+
+      - run: npm ci
+      - run: npm run import:market-offers
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
