@@ -16,9 +16,15 @@ export default function HomePage() {
           </Link>{" "}
           — saisie des index, historique, conso par période.
         </li>
+        <li>
+          <Link href="/contracts" className="underline">
+            Base de tarifs
+          </Link>{" "}
+          — offres du marché, contrat actuel, classement sur ta conso
+          réelle.
+        </li>
         <li className="text-slate-400">
-          Base de tarifs, comparateur, alertes et dashboard : modules à
-          venir.
+          Alertes email et dashboard : modules à venir.
         </li>
       </ul>
     </main>

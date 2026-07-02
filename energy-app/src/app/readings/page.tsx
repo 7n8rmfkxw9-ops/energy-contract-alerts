@@ -7,13 +7,12 @@ import type { Database } from "@/types/database";
 import {
   computeConsumptionPeriods,
   daysSinceLastReading,
+  DEFAULT_GAS_KWH_PER_M3,
 } from "@/lib/readings/consumption";
+import { parseDecimalInput } from "@/lib/forms/parseDecimal";
 
 type ReadingRow = Database["public"]["Tables"]["meter_readings"]["Row"];
 type Supabase = ReturnType<typeof createClient>;
-
-// coefficient par défaut avant que user_settings soit configurable via l'UI
-const DEFAULT_GAS_KWH_PER_M3 = 11.5;
 
 interface FormState {
   readingDate: string;
@@ -30,14 +29,6 @@ const emptyForm = (): FormState => ({
   gas: "",
   note: "",
 });
-
-/** Accepte la virgule décimale (saisie belge) ; null si champ vide. */
-function parseIndexInput(raw: string): number | null {
-  const trimmed = raw.trim();
-  if (trimmed === "") return null;
-  const value = Number(trimmed.replace(",", "."));
-  return Number.isFinite(value) && value >= 0 ? value : null;
-}
 
 export default function ReadingsPage() {
   const [supabase, setSupabase] = useState<Supabase | null>(
@@ -110,8 +101,8 @@ export default function ReadingsPage() {
     if (!supabase || !userId) return;
     setError(null);
 
-    const elecDay = parseIndexInput(form.elecDay);
-    const gas = parseIndexInput(form.gas);
+    const elecDay = parseDecimalInput(form.elecDay);
+    const gas = parseDecimalInput(form.gas);
     if (elecDay === null && gas === null) {
       setError("Renseigne au moins un index (électricité ou gaz).");
       return;
@@ -122,7 +113,7 @@ export default function ReadingsPage() {
       user_id: userId,
       reading_date: form.readingDate,
       elec_day_index: elecDay,
-      elec_night_index: parseIndexInput(form.elecNight),
+      elec_night_index: parseDecimalInput(form.elecNight),
       gas_index_m3: gas,
       note: form.note.trim() || null,
     };

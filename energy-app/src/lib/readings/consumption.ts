@@ -42,6 +42,13 @@ export interface AnnualConsumption {
   gasCoveredDays: number;
 }
 
+/**
+ * Coefficient gaz m³ -> kWh par défaut (gaz riche distribué en Flandre).
+ * La valeur exacte, propre à chaque zone, figure sur la facture ; elle est
+ * configurable via user_settings.
+ */
+export const DEFAULT_GAS_KWH_PER_M3 = 11.5;
+
 const MS_PER_DAY = 86_400_000;
 const DAYS_PER_YEAR = 365.25;
 

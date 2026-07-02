@@ -39,7 +39,8 @@ relève lui-même les index de ses compteurs à intervalle irrégulier.
 | Sélection des contrats à alerter (`src/lib/alerts`) | ✅ + tests |
 | Saisie des relevés — formulaire + historique éditable (`/readings`) | ✅ |
 | Auth minimale (`/auth`) | ✅ |
-| Base de tarifs (formulaire contracts) | ⏳ |
+| Base de tarifs — formulaire + contrat actuel (`/contracts`) | ✅ |
+| Comparateur — classement des offres sur la conso réelle (`/contracts`) | ✅ |
 | Envoi email des alertes (Resend) | ⏳ |
 | Dashboard complet | ⏳ |
 
