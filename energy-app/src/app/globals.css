@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    background-image: radial-gradient(
+      ellipse 1200px 400px at 50% -10%,
+      theme("colors.brand.100"),
+      transparent
+    );
+    background-repeat: no-repeat;
+  }
+
+  ::selection {
+    background-color: theme("colors.brand.200");
+  }
+}
+
+@layer components {
+  .page {
+    @apply mx-auto space-y-8 p-6 sm:p-8;
+  }
+
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-card;
+  }
+
+  .field {
+    @apply mt-1 w-full rounded-lg border border-slate-300 p-2 transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+
+  .btn-primary {
+    @apply rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-50;
+  }
+
+  .btn-danger-link {
+    @apply text-red-600 underline decoration-red-200 underline-offset-2 hover:decoration-red-600;
+  }
+
+  .link-muted {
+    @apply text-slate-600 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-600;
+  }
+}
