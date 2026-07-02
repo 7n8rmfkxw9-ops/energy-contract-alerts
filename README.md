@@ -14,10 +14,6 @@ a cheaper energy contract shows up in a manually-entered rates database.
 
 Stack: Next.js (App Router), Supabase (Postgres + Auth), Tailwind, Vitest.
 
-## About the top-level files
-
-Everything at the repo root outside of `energy-app/` (the Vite/shadcn
-`src/`, top-level `package.json`, `supabase/`, etc.) is leftover scaffolding
-carried over from the `european-coffee-connect` codebase the branch was
-originally built on — it's not part of the Energy Contract Alerts project.
-It can be removed once `energy-app/` is confirmed to stand on its own.
+Leftover `european-coffee-connect` scaffolding that was carried over during
+the migration (top-level `src/`, `package.json`, `supabase/`, `.env`, etc.)
+has been removed, so `energy-app/` is the whole project.
