@@ -17,3 +17,9 @@ Stack: Next.js (App Router), Supabase (Postgres + Auth), Tailwind, Vitest.
 Leftover `european-coffee-connect` scaffolding that was carried over during
 the migration (top-level `src/`, `package.json`, `supabase/`, `.env`, etc.)
 has been removed, so `energy-app/` is the whole project.
+
+## CI
+
+Every push/PR to `main` runs `energy-app`'s tests and build (`test`), and
+PRs are checked for an unfinished checklist (`PR checklist`). Both must
+pass before a PR can merge — see branch protection settings for `main`.
