@@ -15,6 +15,7 @@ import { formatEur } from "@/lib/format";
 
 type ContractRow = Database["public"]["Tables"]["contracts"]["Row"];
 type ReadingRow = Database["public"]["Tables"]["meter_readings"]["Row"];
+type MarketOfferRow = Database["public"]["Tables"]["market_offers"]["Row"];
 type Supabase = ReturnType<typeof createClient>;
 
 const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
@@ -69,11 +70,28 @@ function toPricing(row: ContractRow): ContractPricing {
   };
 }
 
+// préfixées pour ne jamais entrer en collision avec un id `contracts`
+// saisi manuellement dans le classement combiné.
+function toMarketPricing(row: MarketOfferRow): ContractPricing {
+  return {
+    id: `market:${row.id}`,
+    provider: row.provider,
+    offerName: row.offer_name,
+    priceElecKwhDay: row.price_elec_kwh_day,
+    priceElecKwhNight: row.price_elec_kwh_night,
+    priceGasKwh: row.price_gas_kwh,
+    fixedFeeElecAnnual: row.fixed_fee_elec_annual,
+    fixedFeeGasAnnual: row.fixed_fee_gas_annual,
+    isCurrentContract: false,
+  };
+}
+
 export default function ContractsPage() {
   const [supabase, setSupabase] = useState<Supabase | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [contracts, setContracts] = useState<ContractRow[]>([]);
+  const [marketOffers, setMarketOffers] = useState<MarketOfferRow[]>([]);
   const [readings, setReadings] = useState<ReadingRow[]>([]);
   const [gasFactor, setGasFactor] = useState(DEFAULT_GAS_KWH_PER_M3);
   const [form, setForm] = useState<FormState>(emptyForm());
@@ -82,19 +100,25 @@ export default function ContractsPage() {
   const [busy, setBusy] = useState(false);
 
   const loadData = useCallback(async (client: Supabase) => {
-    const [contractsRes, readingsRes, settingsRes] = await Promise.all([
-      client.from("contracts").select("*").order("provider"),
-      client.from("meter_readings").select("*"),
-      client.from("user_settings").select("*").maybeSingle(),
-    ]);
+    const [contractsRes, marketOffersRes, readingsRes, settingsRes] =
+      await Promise.all([
+        client.from("contracts").select("*").order("provider"),
+        client.from("market_offers").select("*").order("provider"),
+        client.from("meter_readings").select("*"),
+        client.from("user_settings").select("*").maybeSingle(),
+      ]);
 
     const firstError =
-      contractsRes.error ?? readingsRes.error ?? settingsRes.error;
+      contractsRes.error ??
+      marketOffersRes.error ??
+      readingsRes.error ??
+      settingsRes.error;
     if (firstError) {
       setError(firstError.message);
       return;
     }
     setContracts(contractsRes.data ?? []);
+    setMarketOffers(marketOffersRes.data ?? []);
     setReadings(readingsRes.data ?? []);
     if (settingsRes.data) setGasFactor(settingsRes.data.gas_kwh_per_m3);
   }, []);
@@ -131,9 +155,15 @@ export default function ContractsPage() {
   const ranked = useMemo(
     () =>
       hasConsumptionProfile
-        ? rankContracts(contracts.map(toPricing), annual)
+        ? rankContracts(
+            [
+              ...contracts.map(toPricing),
+              ...marketOffers.map(toMarketPricing),
+            ],
+            annual,
+          )
         : [],
-    [contracts, annual, hasConsumptionProfile],
+    [contracts, marketOffers, annual, hasConsumptionProfile],
   );
 
   async function handleSubmit(e: React.FormEvent) {
@@ -284,9 +314,12 @@ export default function ContractsPage() {
       <header>
         <h1 className="text-2xl font-semibold">Base de tarifs</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Saisis ici les offres du marché (fiches tarifaires des
-          fournisseurs). Chaque offre est comparée sur ta consommation
-          réelle, pas sur un profil moyen.
+          Les offres marché (fixes, élec + gaz) sont importées
+          automatiquement chaque jour depuis l&apos;open data VREG
+          (V-test®). Utilise le formulaire ci-dessous seulement pour ton
+          contrat actuel, ou une offre non couverte par l&apos;import.
+          Chaque offre est comparée sur ta consommation réelle, pas sur un
+          profil moyen.
         </p>
       </header>
 
@@ -540,6 +573,11 @@ export default function ContractsPage() {
                           actuel
                         </span>
                       )}
+                      {r.contract.id.startsWith("market:") && (
+                        <span className="ml-2 rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                          marché · VREG
+                        </span>
+                      )}
                     </td>
                     <td className="py-2 pr-4">
                       {formatEur(r.cost.totalAnnualCost)}
@@ -632,6 +670,62 @@ export default function ContractsPage() {
                     >
                       Supprimer
                     </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-lg font-medium">
+          Offres marché (import automatique VREG)
+        </h2>
+        {marketOffers.length === 0 ? (
+          <p className="mt-2 text-sm text-slate-500">
+            Aucune offre importée pour l&apos;instant (le job tourne une
+            fois par jour).
+          </p>
+        ) : (
+          <table className="mt-3 w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-slate-300 text-left">
+                <th className="py-2 pr-4">Offre</th>
+                <th className="py-2 pr-4">Élec jour/nuit (€/kWh)</th>
+                <th className="py-2 pr-4">Gaz (€/kWh)</th>
+                <th className="py-2 pr-4">Redevances (€/an)</th>
+                <th className="py-2 pr-4">Tarif au</th>
+                <th className="py-2" />
+              </tr>
+            </thead>
+            <tbody>
+              {marketOffers.map((row) => (
+                <tr key={row.id} className="border-b border-slate-100">
+                  <td className="py-2 pr-4">
+                    {row.provider} — {row.offer_name}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {row.price_elec_kwh_day}
+                    {row.price_elec_kwh_night !== null &&
+                      ` / ${row.price_elec_kwh_night}`}
+                  </td>
+                  <td className="py-2 pr-4">{row.price_gas_kwh}</td>
+                  <td className="py-2 pr-4">
+                    {row.fixed_fee_elec_annual} + {row.fixed_fee_gas_annual}
+                  </td>
+                  <td className="py-2 pr-4">{row.tariff_updated_at}</td>
+                  <td className="py-2 text-right">
+                    {row.source_url && (
+                      <a
+                        href={row.source_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-slate-600 underline"
+                      >
+                        Source
+                      </a>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -115,6 +115,32 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["alerts"]["Insert"]>;
         Relationships: [];
       };
+      market_offers: {
+        Row: {
+          id: string;
+          provider: string;
+          offer_name: string;
+          contract_type: ContractType;
+          price_elec_kwh_day: number;
+          price_elec_kwh_night: number | null;
+          price_gas_kwh: number;
+          fixed_fee_elec_annual: number;
+          fixed_fee_gas_annual: number;
+          commitment_months: number;
+          source_url: string | null;
+          tariff_updated_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["market_offers"]["Row"],
+          "id" | "created_at" | "updated_at"
+        > & { id?: string; created_at?: string; updated_at?: string };
+        Update: Partial<
+          Database["public"]["Tables"]["market_offers"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
