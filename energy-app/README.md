@@ -32,6 +32,11 @@ relève lui-même les index de ses compteurs à intervalle irrégulier.
   du régulateur flamand), pas récupérées site par site. La saisie
   manuelle reste possible pour son contrat actuel ou une offre non
   couverte par l'import.
+- **Import OCR best-effort, jamais auto-enregistré** : l'extraction de
+  prix depuis un PDF/photo de contrat préremplit le formulaire mais
+  n'écrit rien tant que l'utilisateur n'a pas relu et validé — la
+  reconnaissance de mise en page libre (facture) est fiable de façon
+  inégale, contrairement à une fiche tarifaire standardisée.
 
 ## Statut des modules
 
@@ -45,6 +50,7 @@ relève lui-même les index de ses compteurs à intervalle irrégulier.
 | Auth minimale (`/auth`) | ✅ |
 | Base de tarifs — formulaire + contrat actuel (`/contracts`) | ✅ |
 | Import automatique des offres marché (VREG, `src/lib/import`) | ✅ + tests |
+| Import du contrat actuel par OCR/PDF (`/api/import-contract`) | ✅ + tests |
 | Comparateur — classement des offres sur la conso réelle (`/contracts`) | ✅ |
 | Dashboard — vue d'ensemble, rappel de relevé, réglages, historique des alertes (`/`) | ✅ |
 | Envoi email des alertes (Resend) | ⏳ |
@@ -86,6 +92,13 @@ Toutes les tables ont RLS activé avec une policy `auth.uid() = user_id`.
   élec+gaz par fournisseur/produit en offres comparables). Utilisé par
   `scripts/import-market-offers.ts`, lancé quotidiennement par
   `.github/workflows/import-market-offers.yml`.
+- `import/contractDocument.ts` — extraction (best-effort) des prix d'un
+  contrat à partir du texte brut d'une fiche tarifaire, facture ou
+  contrat. Fonction pure/testée ; le texte est extrait en amont par
+  `src/app/api/import-contract/route.ts` (PDF avec calque texte via
+  `pdf-parse`, sinon rendu en image + OCR local via `tesseract.js` —
+  aucun envoi du document à un service tiers). Préremplit le formulaire
+  de `/contracts`, toujours relu/corrigé avant enregistrement.
 
 Tests : `npm test` (vitest).
 

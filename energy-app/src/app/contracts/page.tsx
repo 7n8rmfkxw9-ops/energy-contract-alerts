@@ -98,6 +98,9 @@ export default function ContractsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrError, setOcrError] = useState<string | null>(null);
+  const [ocrMatchedCount, setOcrMatchedCount] = useState<number | null>(null);
 
   const loadData = useCallback(async (client: Supabase) => {
     const [contractsRes, marketOffersRes, readingsRes, settingsRes] =
@@ -165,6 +168,71 @@ export default function ContractsPage() {
         : [],
     [contracts, marketOffers, annual, hasConsumptionProfile],
   );
+
+  async function handleImportDocument(file: File) {
+    setOcrBusy(true);
+    setOcrError(null);
+    setOcrMatchedCount(null);
+
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/import-contract", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setOcrError(data.error ?? "Échec de l'extraction.");
+        return;
+      }
+
+      const extraction = data.extraction as {
+        provider: string | null;
+        offerName: string | null;
+        priceElecKwhDay: number | null;
+        priceElecKwhNight: number | null;
+        priceGasKwh: number | null;
+        fixedFeeElecAnnual: number | null;
+        fixedFeeGasAnnual: number | null;
+        commitmentMonths: number | null;
+        matchedFields: string[];
+      };
+
+      // ne remplace que les champs encore vides, pour ne jamais écraser
+      // une saisie en cours.
+      setForm((prev) => ({
+        ...prev,
+        provider: prev.provider || extraction.provider || "",
+        offerName: prev.offerName || extraction.offerName || "",
+        priceElecDay:
+          prev.priceElecDay ||
+          (extraction.priceElecKwhDay?.toString() ?? ""),
+        priceElecNight:
+          prev.priceElecNight ||
+          (extraction.priceElecKwhNight?.toString() ?? ""),
+        priceGas:
+          prev.priceGas || (extraction.priceGasKwh?.toString() ?? ""),
+        feeElec:
+          extraction.fixedFeeElecAnnual !== null
+            ? extraction.fixedFeeElecAnnual.toString()
+            : prev.feeElec,
+        feeGas:
+          extraction.fixedFeeGasAnnual !== null
+            ? extraction.fixedFeeGasAnnual.toString()
+            : prev.feeGas,
+        commitmentMonths:
+          extraction.commitmentMonths !== null
+            ? extraction.commitmentMonths.toString()
+            : prev.commitmentMonths,
+      }));
+      setOcrMatchedCount(extraction.matchedFields.length);
+    } catch {
+      setOcrError("Échec de l'extraction (réseau ou serveur indisponible).");
+    } finally {
+      setOcrBusy(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -325,6 +393,43 @@ export default function ContractsPage() {
           profil moyen.
         </p>
       </header>
+
+      <section className="card">
+        <h2 className="text-lg font-semibold tracking-tight">
+          Importer mon contrat actuel
+        </h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Dépose une fiche tarifaire (PDF), une facture ou une photo de ton
+          contrat : les prix sont extraits automatiquement et préremplissent
+          le formulaire ci-dessous — vérifie-les avant d&apos;enregistrer.
+          Traitement 100&nbsp;% local, rien n&apos;est envoyé à un service
+          tiers.
+        </p>
+        <input
+          type="file"
+          accept="application/pdf,image/png,image/jpeg,image/webp"
+          disabled={ocrBusy}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (file) void handleImportDocument(file);
+          }}
+          className="field mt-3"
+        />
+        {ocrBusy && (
+          <p className="mt-2 text-sm text-slate-500">
+            Analyse du document en cours…
+          </p>
+        )}
+        {ocrError && <p className="mt-2 text-sm text-red-600">{ocrError}</p>}
+        {ocrMatchedCount !== null && !ocrBusy && !ocrError && (
+          <p className="mt-2 text-sm text-emerald-700">
+            {ocrMatchedCount > 0
+              ? `${ocrMatchedCount} champ${ocrMatchedCount > 1 ? "s" : ""} détecté${ocrMatchedCount > 1 ? "s" : ""} automatiquement. Vérifie les valeurs dans le formulaire ci-dessous avant d'enregistrer.`
+              : "Aucun champ reconnu automatiquement — complète le formulaire manuellement."}
+          </p>
+        )}
+      </section>
 
       <form
         onSubmit={handleSubmit}
