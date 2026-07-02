@@ -41,8 +41,8 @@ relève lui-même les index de ses compteurs à intervalle irrégulier.
 | Auth minimale (`/auth`) | ✅ |
 | Base de tarifs — formulaire + contrat actuel (`/contracts`) | ✅ |
 | Comparateur — classement des offres sur la conso réelle (`/contracts`) | ✅ |
+| Dashboard — vue d'ensemble, rappel de relevé, réglages, historique des alertes (`/`) | ✅ |
 | Envoi email des alertes (Resend) | ⏳ |
-| Dashboard complet | ⏳ |
 
 ## Schéma Supabase
 

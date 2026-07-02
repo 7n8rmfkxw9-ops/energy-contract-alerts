@@ -11,6 +11,7 @@ import {
 } from "@/lib/readings/consumption";
 import { rankContracts, type ContractPricing } from "@/lib/pricing/simulate";
 import { parseDecimalInput } from "@/lib/forms/parseDecimal";
+import { formatEur } from "@/lib/format";
 
 type ContractRow = Database["public"]["Tables"]["contracts"]["Row"];
 type ReadingRow = Database["public"]["Tables"]["meter_readings"]["Row"];
@@ -67,13 +68,6 @@ function toPricing(row: ContractRow): ContractPricing {
     isCurrentContract: row.is_current_contract,
   };
 }
-
-const formatEur = (value: number) =>
-  value.toLocaleString("fr-BE", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  });
 
 export default function ContractsPage() {
   const [supabase, setSupabase] = useState<Supabase | null>(null);
