@@ -298,10 +298,10 @@ export default function ContractsPage() {
 
   if (!userId) {
     return (
-      <main className="mx-auto max-w-xl p-8">
+      <main className="page max-w-xl">
         <p>
           Tu dois être connecté pour gérer les offres.{" "}
-          <Link href="/auth" className="underline">
+          <Link href="/auth" className="text-brand-600 underline">
             Se connecter
           </Link>
         </p>
@@ -310,9 +310,12 @@ export default function ContractsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-8 p-8">
+    <main className="page max-w-5xl">
       <header>
-        <h1 className="text-2xl font-semibold">Base de tarifs</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+          Tarifs
+        </p>
+        <h1 className="text-2xl font-bold tracking-tight">Base de tarifs</h1>
         <p className="mt-1 text-sm text-slate-600">
           Les offres marché (fixes, élec + gaz) sont importées
           automatiquement chaque jour depuis l&apos;open data VREG
@@ -325,9 +328,9 @@ export default function ContractsPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 sm:grid-cols-3"
+        className="card grid gap-4 sm:grid-cols-3"
       >
-        <h2 className="text-lg font-medium sm:col-span-3">
+        <h2 className="text-lg font-semibold tracking-tight sm:col-span-3">
           {editingId ? "Modifier l'offre" : "Nouvelle offre"}
         </h2>
 
@@ -339,7 +342,7 @@ export default function ContractsPage() {
             placeholder="ex : Engie"
             value={form.provider}
             onChange={(e) => setForm({ ...form, provider: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -351,7 +354,7 @@ export default function ContractsPage() {
             placeholder="ex : Easy Fixed"
             value={form.offerName}
             onChange={(e) => setForm({ ...form, offerName: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -362,7 +365,7 @@ export default function ContractsPage() {
             onChange={(e) =>
               setForm({ ...form, contractType: e.target.value as ContractType })
             }
-            className="mt-1 w-full rounded border border-slate-300 bg-white p-2"
+            className="field bg-white"
           >
             {Object.entries(CONTRACT_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -383,7 +386,7 @@ export default function ContractsPage() {
             onChange={(e) =>
               setForm({ ...form, priceElecDay: e.target.value })
             }
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -398,7 +401,7 @@ export default function ContractsPage() {
             onChange={(e) =>
               setForm({ ...form, priceElecNight: e.target.value })
             }
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -411,7 +414,7 @@ export default function ContractsPage() {
             placeholder="ex : 0,04"
             value={form.priceGas}
             onChange={(e) => setForm({ ...form, priceGas: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -422,7 +425,7 @@ export default function ContractsPage() {
             inputMode="decimal"
             value={form.feeElec}
             onChange={(e) => setForm({ ...form, feeElec: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -433,7 +436,7 @@ export default function ContractsPage() {
             inputMode="decimal"
             value={form.feeGas}
             onChange={(e) => setForm({ ...form, feeGas: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -446,7 +449,7 @@ export default function ContractsPage() {
             onChange={(e) =>
               setForm({ ...form, commitmentMonths: e.target.value })
             }
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -459,7 +462,7 @@ export default function ContractsPage() {
             placeholder="https://…"
             value={form.sourceUrl}
             onChange={(e) => setForm({ ...form, sourceUrl: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -472,7 +475,7 @@ export default function ContractsPage() {
             onChange={(e) =>
               setForm({ ...form, tariffUpdatedAt: e.target.value })
             }
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -482,7 +485,7 @@ export default function ContractsPage() {
             type="text"
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -503,7 +506,7 @@ export default function ContractsPage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+            className="btn-primary"
           >
             {editingId ? "Enregistrer" : "Ajouter l'offre"}
           </button>
@@ -514,7 +517,7 @@ export default function ContractsPage() {
                 setEditingId(null);
                 setForm(emptyForm());
               }}
-              className="rounded border border-slate-300 px-4 py-2"
+              className="btn-secondary"
             >
               Annuler
             </button>
@@ -523,7 +526,7 @@ export default function ContractsPage() {
       </form>
 
       <section>
-        <h2 className="text-lg font-medium">
+        <h2 className="text-lg font-semibold tracking-tight">
           Classement sur ta consommation réelle
         </h2>
         {!hasConsumptionProfile ? (
@@ -563,7 +566,7 @@ export default function ContractsPage() {
                 {ranked.map((r, i) => (
                   <tr
                     key={r.contract.id}
-                    className={`border-b border-slate-100 ${r.contract.isCurrentContract ? "bg-slate-50 font-medium" : ""}`}
+                    className={`border-b border-slate-100 ${r.contract.isCurrentContract ? "bg-brand-50/60 font-semibold" : ""}`}
                   >
                     <td className="py-2 pr-4">{i + 1}</td>
                     <td className="py-2 pr-4">
@@ -605,7 +608,7 @@ export default function ContractsPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-medium">Offres saisies</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Offres saisies</h2>
         {contracts.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">
             Aucune offre. Commence par saisir ton contrat actuel (coche
@@ -653,20 +656,20 @@ export default function ContractsPage() {
                     {!row.is_current_contract && (
                       <button
                         onClick={() => setAsCurrent(row.id)}
-                        className="mr-3 text-slate-600 underline"
+                        className="mr-3 link-muted"
                       >
                         Définir actuel
                       </button>
                     )}
                     <button
                       onClick={() => startEdit(row)}
-                      className="mr-3 text-slate-600 underline"
+                      className="mr-3 link-muted"
                     >
                       Éditer
                     </button>
                     <button
                       onClick={() => handleDelete(row.id)}
-                      className="text-red-600 underline"
+                      className="btn-danger-link"
                     >
                       Supprimer
                     </button>
@@ -679,7 +682,7 @@ export default function ContractsPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-medium">
+        <h2 className="text-lg font-semibold tracking-tight">
           Offres marché (import automatique VREG)
         </h2>
         {marketOffers.length === 0 ? (
@@ -721,7 +724,7 @@ export default function ContractsPage() {
                         href={row.source_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-slate-600 underline"
+                        className="link-muted"
                       >
                         Source
                       </a>

@@ -48,16 +48,26 @@ function StatTile({
   value,
   detail,
   href,
+  accent,
 }: {
   label: string;
   value: string;
   detail?: React.ReactNode;
   href?: string;
+  accent?: "positive";
 }) {
   const body = (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
+    <div
+      className={`card p-4 transition ${href ? "hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md" : ""}`}
+    >
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </p>
+      <p
+        className={`mt-1.5 text-2xl font-bold tracking-tight ${accent === "positive" ? "text-emerald-600" : "text-slate-900"}`}
+      >
+        {value}
+      </p>
       {detail && <div className="mt-1 text-sm text-slate-600">{detail}</div>}
     </div>
   );
@@ -215,14 +225,16 @@ export default function DashboardPage() {
 
   if (!userId) {
     return (
-      <main className="mx-auto max-w-xl p-8">
-        <h1 className="text-2xl font-semibold">Energy Contract Alerts</h1>
+      <main className="page max-w-xl">
+        <h1 className="text-2xl font-bold tracking-tight">
+          Volt<span className="text-spark-500">Watch</span>
+        </h1>
         <p className="mt-2 text-slate-600">
           Suivi de consommation par relevés d&apos;index (compteur analogique)
           et comparaison de contrats d&apos;énergie sur ton profil réel.
         </p>
         <p className="mt-4">
-          <Link href="/auth" className="underline">
+          <Link href="/auth" className="btn-primary inline-block">
             Se connecter pour commencer
           </Link>
         </p>
@@ -231,18 +243,23 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-8 p-8">
+    <main className="page max-w-5xl">
       <header>
-        <h1 className="text-2xl font-semibold">Tableau de bord</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+          Tableau de bord
+        </p>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Salut <span aria-hidden="true">👋</span>
+        </h1>
       </header>
 
       {reminderDue && (
-        <p className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          ⚠{" "}
+        <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <span aria-hidden="true">⚠️</span>
           {daysSince === null
             ? "Aucun relevé enregistré : commence par relever tes compteurs."
-            : `Dernier relevé il y a ${daysSince} jours (rappel réglé à ${reminderDays} jours) : pense à relever tes compteurs.`}{" "}
-          <Link href="/readings" className="underline">
+            : `Dernier relevé il y a ${daysSince} jours (rappel réglé à ${reminderDays} jours) : pense à relever tes compteurs.`}
+          <Link href="/readings" className="font-medium text-amber-900 underline">
             Saisir un relevé
           </Link>
         </p>
@@ -297,6 +314,11 @@ export default function DashboardPage() {
                 ? "ton contrat actuel est le moins cher"
                 : undefined
           }
+          accent={
+            potentialSavings !== null && potentialSavings > 0
+              ? "positive"
+              : undefined
+          }
         />
       </section>
 
@@ -315,7 +337,7 @@ export default function DashboardPage() {
       )}
 
       <section>
-        <h2 className="text-lg font-medium">Historique des alertes</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Historique des alertes</h2>
         {alerts.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">
             Aucune alerte envoyée pour l&apos;instant. Une alerte email part
@@ -358,9 +380,9 @@ export default function DashboardPage() {
       {settingsForm && (
         <form
           onSubmit={handleSaveSettings}
-          className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 sm:grid-cols-2"
+          className="card grid gap-4 sm:grid-cols-2"
         >
-          <h2 className="text-lg font-medium sm:col-span-2">Réglages</h2>
+          <h2 className="text-lg font-semibold tracking-tight sm:col-span-2">Réglages</h2>
 
           <label className="block">
             <span className="text-sm font-medium">
@@ -373,7 +395,7 @@ export default function DashboardPage() {
               onChange={(e) =>
                 setSettingsForm({ ...settingsForm, threshold: e.target.value })
               }
-              className="mt-1 w-full rounded border border-slate-300 p-2"
+              className="field"
             />
           </label>
 
@@ -391,7 +413,7 @@ export default function DashboardPage() {
                   reminderDays: e.target.value,
                 })
               }
-              className="mt-1 w-full rounded border border-slate-300 p-2"
+              className="field"
             />
           </label>
 
@@ -406,7 +428,7 @@ export default function DashboardPage() {
               onChange={(e) =>
                 setSettingsForm({ ...settingsForm, gasFactor: e.target.value })
               }
-              className="mt-1 w-full rounded border border-slate-300 p-2"
+              className="field"
             />
           </label>
 
@@ -424,7 +446,7 @@ export default function DashboardPage() {
                   notifyEmail: e.target.value,
                 })
               }
-              className="mt-1 w-full rounded border border-slate-300 p-2"
+              className="field"
             />
           </label>
 
@@ -455,7 +477,7 @@ export default function DashboardPage() {
             <button
               type="submit"
               disabled={busy}
-              className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+              className="btn-primary"
             >
               Enregistrer les réglages
             </button>

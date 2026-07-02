@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Manrope } from "next/font/google";
+import { NavBar } from "@/components/NavBar";
 import "./globals.css";
 
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
+
 export const metadata: Metadata = {
-  title: "Energy Contract Alerts",
+  title: "VoltWatch — Energy Contract Alerts",
   description: "Pilotage des contrats d'électricité et de gaz (Belgique)",
 };
 
@@ -13,21 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen bg-slate-50 text-slate-900">
-        <nav className="border-b border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-5xl gap-6 px-8 py-3 text-sm">
-            <Link href="/" className="font-medium">
-              Tableau de bord
-            </Link>
-            <Link href="/readings" className="text-slate-600 hover:underline">
-              Relevés
-            </Link>
-            <Link href="/contracts" className="text-slate-600 hover:underline">
-              Tarifs
-            </Link>
-          </div>
-        </nav>
+    <html lang="fr" className={manrope.variable}>
+      <body className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <NavBar />
         {children}
       </body>
     </html>

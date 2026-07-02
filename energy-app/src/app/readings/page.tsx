@@ -175,10 +175,10 @@ export default function ReadingsPage() {
 
   if (!userId) {
     return (
-      <main className="mx-auto max-w-xl p-8">
+      <main className="page max-w-xl">
         <p>
           Tu dois être connecté pour saisir des relevés.{" "}
-          <Link href="/auth" className="underline">
+          <Link href="/auth" className="text-brand-600 underline">
             Se connecter
           </Link>
         </p>
@@ -187,9 +187,14 @@ export default function ReadingsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl space-y-8 p-8">
+    <main className="page max-w-4xl">
       <header>
-        <h1 className="text-2xl font-semibold">Relevés de compteur</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+          Relevés
+        </p>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Relevés de compteur
+        </h1>
         {daysSince !== null && (
           <p className="mt-1 text-sm text-slate-600">
             Dernier relevé : il y a {daysSince} jour{daysSince > 1 ? "s" : ""}.
@@ -199,9 +204,9 @@ export default function ReadingsPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 sm:grid-cols-2"
+        className="card grid gap-4 sm:grid-cols-2"
       >
-        <h2 className="text-lg font-medium sm:col-span-2">
+        <h2 className="text-lg font-semibold tracking-tight sm:col-span-2">
           {editingId ? "Corriger le relevé" : "Nouveau relevé"}
         </h2>
 
@@ -212,7 +217,7 @@ export default function ReadingsPage() {
             required
             value={form.readingDate}
             onChange={(e) => setForm({ ...form, readingDate: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -224,7 +229,7 @@ export default function ReadingsPage() {
             placeholder="ex : 4321,875"
             value={form.gas}
             onChange={(e) => setForm({ ...form, gas: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -238,7 +243,7 @@ export default function ReadingsPage() {
             placeholder="ex : 45210,4"
             value={form.elecDay}
             onChange={(e) => setForm({ ...form, elecDay: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -251,7 +256,7 @@ export default function ReadingsPage() {
             inputMode="decimal"
             value={form.elecNight}
             onChange={(e) => setForm({ ...form, elecNight: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -261,7 +266,7 @@ export default function ReadingsPage() {
             type="text"
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-300 p-2"
+            className="field"
           />
         </label>
 
@@ -271,7 +276,7 @@ export default function ReadingsPage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+            className="btn-primary"
           >
             {editingId ? "Enregistrer la correction" : "Ajouter le relevé"}
           </button>
@@ -282,7 +287,7 @@ export default function ReadingsPage() {
                 setEditingId(null);
                 setForm(emptyForm());
               }}
-              className="rounded border border-slate-300 px-4 py-2"
+              className="btn-secondary"
             >
               Annuler
             </button>
@@ -291,7 +296,7 @@ export default function ReadingsPage() {
       </form>
 
       <section>
-        <h2 className="text-lg font-medium">Historique</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Historique</h2>
         {readings.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">
             Aucun relevé pour l&apos;instant. Ajoute ton premier index
@@ -320,13 +325,13 @@ export default function ReadingsPage() {
                   <td className="py-2 text-right">
                     <button
                       onClick={() => startEdit(row)}
-                      className="mr-3 text-slate-600 underline"
+                      className="mr-3 link-muted"
                     >
                       Éditer
                     </button>
                     <button
                       onClick={() => handleDelete(row.id)}
-                      className="text-red-600 underline"
+                      className="btn-danger-link"
                     >
                       Supprimer
                     </button>
@@ -340,7 +345,7 @@ export default function ReadingsPage() {
 
       {periods.length > 0 && (
         <section>
-          <h2 className="text-lg font-medium">
+          <h2 className="text-lg font-semibold tracking-tight">
             Consommation entre relevés
           </h2>
           <table className="mt-3 w-full border-collapse text-sm">
